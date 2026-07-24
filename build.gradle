@@ -27,9 +27,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 //    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
-    implementation 'com.mysql:mysql-connector-j:8.0.32'
 //    implementation group: 'com.rick.db', name: 'sharp-database', version: '2.0-SNAPSHOT'
     implementation group: 'com.rick.db', name: 'sharp-database2', version: '3.0-SNAPSHOT'
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
+    implementation 'org.postgresql:postgresql'
 }
 
 test {

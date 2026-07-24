@@ -4,6 +4,7 @@ import com.rick.backend.module.common.exception.ResourceNotFoundException;
 import com.rick.common.http.HttpServletRequestUtils;
 import com.rick.common.http.model.Result;
 import com.rick.common.http.model.ResultUtils;
+import com.rick.common.util.JsonUtils;
 import com.rick.db.plugin.BaseServiceImpl;
 import com.rick.db.plugin.page.Grid;
 import com.rick.db.plugin.page.GridUtils;
@@ -14,6 +15,7 @@ import com.rick.db.repository.support.Constants;
 import com.rick.db.repository.support.SQLParamCleaner;
 import com.rick.db.util.OperatorUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +40,7 @@ public class BaseApi<S extends BaseServiceImpl<? extends EntityDAO<T, ID>, T, ID
     @Resource
     protected TableDAO tableDAO;
 
+    @SuppressWarnings("unchecked")
     public BaseApi(S baseService) {
         this.baseService = baseService;
         this.entityDAO = baseService.getBaseDAO();
@@ -109,14 +112,14 @@ public class BaseApi<S extends BaseServiceImpl<? extends EntityDAO<T, ID>, T, ID
     }
 
     @PutMapping("{id}")
-    public EntityId update(@PathVariable ID id, @Valid @RequestBody T t) {
+    public EntityId<ID> update(@PathVariable ID id, @Valid @RequestBody T t) {
         t.setId(id);
         baseService.update(t);
         return t;
     }
 
     @PostMapping
-    public EntityId saveOrUpdate(@Valid @RequestBody T t) {
+    public EntityId<ID> saveOrUpdate(@Valid @RequestBody T t) {
         baseService.insertOrUpdate(t);
         return t;
     }
@@ -157,10 +160,10 @@ public class BaseApi<S extends BaseServiceImpl<? extends EntityDAO<T, ID>, T, ID
 
             Object value = entry.getValue();
             if (Objects.nonNull(value)) {
-//                if (value instanceof PGobject pgObject) {
-//                    String value1 = pgObject.getValue();
-//                    value = JsonUtils.toJsonNode(value1);
-//                }
+                if (value instanceof PGobject) {
+                    String value1 = ((PGobject)value).getValue();
+                    value = JsonUtils.toJsonNode(value1);
+                }
 
                 result.put(key, value);
             }
