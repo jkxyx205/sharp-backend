@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.5.3'
+}
+
+apply plugin: 'java'
+apply plugin: 'io.spring.dependency-management'
+
+group 'com.rick.backend'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+// jar 包名称自定义
+bootJar {
+    archiveBaseName = 'sharp-backend'
+}
+
+dependencies {
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly group: 'org.projectlombok', name: 'lombok'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+//    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
+//    implementation group: 'com.rick.db', name: 'sharp-database', version: '2.0-SNAPSHOT'
+    implementation group: 'com.rick.db', name: 'sharp-database2', version: '3.0-SNAPSHOT'
+}
+
+test {
+    useJUnitPlatform()
+}

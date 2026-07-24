@@ -1,0 +1,31 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: sharp-backend
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-request-size: 1000MB
+      max-file-size: 40MB
+  datasource:
+    url: ${JDBC.URL}
+    username: ${JDBC.USERNAME}
+    password: ${JDBC.PASSWORD}
+    hikari:
+      # 2核：2 * 2 + 1 = 5，留余量设 10
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+sharp:
+  database: # 多个包扫描用 , 隔开
+    entity-base-package: com.rick.backend.module.**.entity
+
+app:
+  version: v2026.06.17

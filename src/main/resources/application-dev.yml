@@ -1,0 +1,14 @@
+spring:
+  config:
+    import:
+      - optional:classpath:.env-dev.properties
+logging:
+  level:
+    com.rick.admin: DEBUG
+    com.rick.db: DEBUG
+    com:
+      zaxxer:
+        hikari:
+          ERROR
+  file:
+    path: /Users/rick/Space/tmp/admin/log
