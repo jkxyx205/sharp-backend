@@ -1,0 +1,14 @@
+spring:
+  config:
+    import:
+      - optional:file:.env-prod.properties
+logging:
+  level:
+    com.rick.admin: DEBUG
+    com.rick.db: DEBUG
+    com:
+      zaxxer:
+        hikari:
+          ERROR
+  file:
+    path: /usr/local/projects/sharp-backend/log
