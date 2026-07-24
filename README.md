@@ -25,6 +25,58 @@
 ./gradlew clean build
 ```
 
+
+**BaseApi 使用指南**
+`BaseApi` 位于 `src/main/java/com/rick/backend/module/common/controller/BaseApi.java`，提供通用的增删改查与列表接口实现，控制器可以通过继承 `BaseApi` 快速暴露标准 REST 接口。
+
+常用端点（基于子控制器 `@RequestMapping` 的路径前缀）：
+- `GET /`：列表查询，返回分页 `Grid<Map<String,Object>>`（已扁平化联表字段名），支持查询参数（分页、过滤等，由 `GridUtils` 与表的 `selectConditionSQL` 决定）。
+- `GET /detail`：级联详情列表，返回 `Grid<T>`，rows 为完整实体对象列表（根据 `selectByIds`）。
+- `GET /one`：基于请求参数的单条查询，返回 `T`（若未命中抛出 `ResourceNotFoundException`）。
+- `GET /new`：返回一个实体空实例（用于前端构建默认值）。
+- `GET /{id}`：按主键查询单个实体。
+- `POST /`：保存或更新实体（`insertOrUpdate`），请求体 `application/json`。
+- `PUT /{id}`：按主键更新实体，路径 `id` 会设置到请求体实体上后执行 `update`。
+- `DELETE /{id}`：删除指定主键实体，返回操作结果包装在 `Result<?>` 中。
+
+示例：如果你已有 `CourseService` 与 `Course` 实体，可以这样定义控制器：
+
+```java
+@RestController
+@RequestMapping("courses")
+public class CourseApi extends BaseApi<CourseService, Course, Long> {
+	public CourseApi(CourseService baseService) {
+		super(baseService);
+	}
+}
+```
+
+示例请求：
+
+```bash
+# 列表
+curl -sS "http://localhost:8080/courses"
+
+# 详情列表
+curl -sS "http://localhost:8080/courses/detail"
+
+# 新建模板
+curl -sS "http://localhost:8080/courses/new"
+
+# 查询 id=1
+curl -sS "http://localhost:8080/courses/1"
+
+# 保存/更新（JSON body）
+curl -sS -X POST "http://localhost:8080/courses" -H "Content-Type: application/json" -d '{"name":"新课程","teacher":"李老师"}'
+
+# 删除 id=1
+curl -sS -X DELETE "http://localhost:8080/courses/1"
+```
+
+扩展/注意事项：
+- 控制器继承 `BaseApi` 后可以直接使用以上端点；若需自定义行为，可覆写对应方法或在子类中新增端点。
+- `list` 返回的 Map 会调用 `flattenKeys` 做键扁平化（例如 `teacher.name` → `teacherName`），便于前端消费。
+- 异常处理：未找到资源时会抛出 `ResourceNotFoundException`，请在全局异常处理器中统一转换为合适的 HTTP 返回。
 运行测试：
 
 ```bash
