@@ -24,13 +24,22 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
     compileOnly group: 'org.projectlombok', name: 'lombok'
 
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+    implementation 'commons-io:commons-io:2.11.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
 //    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
 //    implementation group: 'com.rick.db', name: 'sharp-database', version: '2.0-SNAPSHOT'
     implementation group: 'com.rick.db', name: 'sharp-database2', version: '3.0-SNAPSHOT'
     implementation 'com.mysql:mysql-connector-j:8.0.32'
     implementation 'org.postgresql:postgresql'
+
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 }
 
 test {
