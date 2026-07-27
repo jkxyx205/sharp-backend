@@ -2,6 +2,7 @@ package com.rick.backend.module.demo.controller;
 
 import com.rick.backend.module.demo.entity.Course;
 import com.rick.backend.module.demo.service.CourseService;
+import com.rick.common.http.exception.BizException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,5 +30,10 @@ public class DemoController {
     @GetMapping("courses/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable long id) {
         return ResponseEntity.ok(courseService.selectById(id).get());
+    }
+
+    @GetMapping("error")
+    public String error() {
+        throw new BizException("error");
     }
 }

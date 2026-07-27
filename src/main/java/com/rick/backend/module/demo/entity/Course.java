@@ -6,7 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**
@@ -25,6 +25,7 @@ public class Course extends EntityId<Long> {
     /**
      * 课程名称
      */
+    @NotBlank
     private String name;
 
     /**
