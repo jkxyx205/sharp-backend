@@ -97,6 +97,42 @@ curl -sS -X DELETE "http://localhost:8080/courses/1"
 - 新增接口：在 `controller` 下创建新的 Controller；业务逻辑放在 `service`，数据访问放在 `dao`。
 - 按需在 `application-*.yml` 中添加环境特定配置，运行时通过 `--spring.profiles.active` 指定。
 
+**当前认证策略（Auth）**
+- 所有接口默认通过拦截器校验 `token`，未携带或无效时返回 `401`。
+- 登录接口：`POST /login`，请求体包含 `username` 和 `password`。
+- 登录成功后返回一个 `token`，前端后续请求需在请求头中携带：`token: <token>`。
+- 退出登录接口：`POST /logout`，同样通过 `token` 头进行鉴权，当前设备的 token 会被移除。
+- 认证策略为“按设备绑定 token”：
+  - 同一设备重复登录时，直接返回旧 token，并刷新它的过期时间。
+  - 不同设备登录时，各自保留独立的 token，不会互相影响。
+  - 只要 token 被正常使用，缓存有效期会被刷新，默认保持 120 分钟有效。
+
+示例请求：
+
+```bash
+# 登录
+curl -sS -X POST "http://localhost:9090/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"123456"}'
+
+# 访问受保护接口（替换为实际返回的 token）
+curl -sS "http://localhost:9090/xxx" \
+  -H "token: <your-token>"
+
+# 当前设备退出登录
+curl -sS -X POST "http://localhost:9090/logout" \
+  -H "token: <your-token>"
+```
+
+如果需要区分设备，可以在登录请求中额外携带 `X-Device-Id` 头：
+
+```bash
+curl -sS -X POST "http://localhost:9090/login" \
+  -H "Content-Type: application/json" \
+  -H "X-Device-Id: device-001" \
+  -d '{"username":"admin","password":"1111112"}'
+```
+
 **贡献**
 - 欢迎 issue 与 PR。提交变更前请确保本地能通过 `./gradlew build`。
 
