@@ -20,12 +20,30 @@ import java.util.Optional;
 @Validated
 public class UserService extends BaseServiceImpl<UserDAO, User, Long> {
 
-    public UserService(UserDAO baseDAO) {
+    private final AuthTokenService authTokenService;
+
+    public UserService(UserDAO baseDAO, AuthTokenService authTokenService) {
         super(baseDAO);
+        this.authTokenService = authTokenService;
     }
 
     public Optional<User> findByUsername(String username) {
         return OperatorUtils.expectedAsOptional(select(User.builder().username(username).build()));
+    }
+
+    public User changePassword(String username, String oldPassword, String newPassword) {
+        User user = findByUsername(username)
+                .orElseThrow(() -> new BizException(401, "用户不存在"));
+        if (!PasswordUtils.matches(oldPassword, username, user.getPassword())) {
+            throw new BizException(401, "旧密码不正确");
+        }
+        if (!StringUtils.hasText(newPassword)) {
+            throw new BizException(400, "新密码不能为空");
+        }
+        user.setPassword(newPassword);
+        User updatedUser = update(user);
+        authTokenService.revokeUserTokens(username);
+        return updatedUser;
     }
 
     @Override

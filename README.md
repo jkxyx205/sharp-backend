@@ -130,7 +130,20 @@ curl -sS -X POST "http://localhost:9090/logout" \
 curl -sS -X POST "http://localhost:9090/login" \
   -H "Content-Type: application/json" \
   -H "X-Device-Id: device-001" \
-  -d '{"username":"admin","password":"1111112"}'
+  -d '{"username":"admin","password":"123456"}'
+```
+
+**用户密码修改**
+- 新增接口：`POST /users/change-password`
+- 请求体包含：`username`、`oldPassword`、`newPassword`
+- 旧密码校验通过后，系统会更新为新的加密密码。
+
+示例请求：
+
+```bash
+curl -sS -X POST "http://localhost:9090/users/change-password" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","oldPassword":"123456","newPassword":"2222222"}'
 ```
 
 **贡献**
