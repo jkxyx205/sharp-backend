@@ -45,6 +45,7 @@ public class AuthService {
         String deviceKey = resolveDeviceKey(request);
         String existingToken = findTokenByDevice(username, deviceKey);
         if (StringUtils.hasText(existingToken)) {
+//            revokeToken(existingToken);
             manageToken(username, deviceKey, existingToken);
             return existingToken;
         }
@@ -90,6 +91,31 @@ public class AuthService {
         usernameTokenCache.put(username, userTokens);
     }
 
+//    private void revokeTokenByIdentity(String token) {
+//        if (!StringUtils.hasText(token)) {
+//            return;
+//        }
+//        String identity = tokenCache.getIfPresent(token);
+//        if (identity == null) {
+//            return;
+//        }
+//        revokeTokenByIdentity(token, identity);
+//    }
+//
+    private void revokeTokenByIdentity(String token, String identity) {
+        String username = identity.split(":", 2)[0];
+        tokenCache.invalidate(token);
+        Set<String> userTokens = usernameTokenCache.getIfPresent(username);
+        if (userTokens != null) {
+            userTokens.remove(token);
+            if (userTokens.isEmpty()) {
+                usernameTokenCache.invalidate(username);
+            } else {
+                usernameTokenCache.put(username, userTokens);
+            }
+        }
+    }
+
     /**
      * 校验 token，合法则刷新有效期为 120 分钟。
      */
@@ -114,18 +140,7 @@ public class AuthService {
         if (identity == null) {
             return false;
         }
-        String username = identity.split(":", 2)[0];
-
-        tokenCache.invalidate(token);
-        Set<String> userTokens = usernameTokenCache.getIfPresent(username);
-        if (userTokens != null) {
-            userTokens.remove(token);
-            if (userTokens.isEmpty()) {
-                usernameTokenCache.invalidate(username);
-            } else {
-                usernameTokenCache.put(username, userTokens);
-            }
-        }
+        revokeTokenByIdentity(token, identity);
         return true;
     }
 }
