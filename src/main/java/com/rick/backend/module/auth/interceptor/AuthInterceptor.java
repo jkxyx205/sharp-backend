@@ -6,6 +6,7 @@ import com.rick.common.http.model.ResultUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -24,6 +25,10 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader(TOKEN_HEADER);
+        if (StringUtils.isBlank(token)) {
+            token = request.getParameter(TOKEN_HEADER);
+        }
+
         if (authService.validateAndRefresh(token)) {
             return true;
         }
