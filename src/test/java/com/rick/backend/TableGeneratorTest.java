@@ -1,5 +1,6 @@
 package com.rick.backend;
 
+import com.rick.backend.module.auth.entity.User;
 import com.rick.backend.module.demo.entity.Course;
 import com.rick.db.plugin.generator.TableGenerator;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ public class TableGeneratorTest {
     @Test
     public void generateTable() {
         tableGenerator.createTable(Course.class);
+        tableGenerator.createTable(User.class);
     }
 
 }
