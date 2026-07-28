@@ -22,7 +22,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public Result<Map<String, String>> login(@RequestBody Map<String, String> body) {
-        String token = authService.login(body.get("username"), body.get("password"));
-        return ResultUtils.success(Collections.singletonMap("token", token));
+//        try {
+            String token = authService.login(body.get("username"), body.get("password"));
+            return ResultUtils.success(Collections.singletonMap("token", token));
+//        } catch (BizException e) {
+//            return e.getResult();
+//        }
     }
 }
