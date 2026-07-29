@@ -1,5 +1,7 @@
 package com.rick.backend.config;
 
+import com.rick.backend.module.auth.entity.User;
+import com.rick.backend.module.auth.service.UserContextHolder;
 import com.rick.common.http.exception.ApiExceptionHandler;
 import com.rick.common.http.web.SharpWebMvcConfigurer;
 import com.rick.db.repository.TableDAO;
@@ -11,6 +13,7 @@ import com.rick.db.repository.support.baseinfo.ExtendTableDAOImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -26,16 +29,16 @@ import java.util.Map;
 @ComponentScan(basePackageClasses = {ApiExceptionHandler.class})
 public class ProjectConfig extends SharpWebMvcConfigurer {
 
-//    @Bean
-//    @Primary
+    @Bean
+    @Primary
     public TableDAO tableDAO(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         return new ExtendTableDAOImpl(namedParameterJdbcTemplate) {
             @Override
             public long getUserId() {
-//                User user = UserContextHolder.get();
-//                user = (user == null) ? User.builder().id(1L).build() : user;
-//                return user.getId();
-                return 1L;
+                User user = UserContextHolder.get();
+                user = (user == null) ? User.builder().id(1L).build() : user;
+                return user.getId();
+//                return 1L;
             }
 
             @Override
