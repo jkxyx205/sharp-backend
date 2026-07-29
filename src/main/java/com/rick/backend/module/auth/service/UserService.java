@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -20,7 +19,7 @@ import java.util.Optional;
 @Validated
 public class UserService extends BaseServiceImpl<UserDAO, User, Long> {
 
-    private final AuthTokenService authTokenService;
+    AuthTokenService authTokenService;
 
     public UserService(UserDAO baseDAO, AuthTokenService authTokenService) {
         super(baseDAO);
@@ -52,9 +51,9 @@ public class UserService extends BaseServiceImpl<UserDAO, User, Long> {
             throw new BizException(400, "密码不能为空");
         }
         encryptPassword(user);
-        if (user.getCreateTime() == null) {
-            user.setCreateTime(LocalDateTime.now());
-        }
+//        if (user.getCreateTime() == null) {
+//            user.setCreateTime(LocalDateTime.now());
+//        }
         return super.insert(user);
     }
 

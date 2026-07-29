@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AuthInterceptor implements HandlerInterceptor {
 
-    public static final String TOKEN_HEADER = "token";
+    static String TOKEN_HEADER = "token";
 
     AuthService authService;
 

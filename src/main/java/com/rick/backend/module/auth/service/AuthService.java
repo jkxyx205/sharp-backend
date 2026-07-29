@@ -1,5 +1,8 @@
 package com.rick.backend.module.auth.service;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.rick.backend.module.auth.config.AuthConstants;
 import com.rick.backend.module.auth.entity.User;
 import com.rick.backend.module.auth.util.PasswordUtils;
 import com.rick.common.http.exception.BizException;
@@ -11,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,11 @@ public class AuthService {
 
     AuthTokenService authTokenService;
 
+    Cache<String, User> userCache = Caffeine.newBuilder()
+            .expireAfterWrite(AuthConstants.TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES)
+            .maximumSize(AuthConstants.MAXIMUM_SIZE)
+            .build();
+
     public String login(String username, String password, HttpServletRequest request) {
         User user = userService.findByUsername(username)
                 .orElseThrow(() -> new BizException(401, "用户名或密码错误"));
@@ -28,9 +37,13 @@ public class AuthService {
             throw new BizException(401, "用户名或密码错误");
         }
 
+        UserContextHolder.set(user);
+        userCache.put(username, user);
+
         String deviceKey = resolveDeviceKey(request);
         String existingToken = authTokenService.findTokenByDevice(username, deviceKey);
         if (StringUtils.hasText(existingToken)) {
+//            revokeUserTokens(username);
             authTokenService.refreshToken(existingToken, username, deviceKey);
             return existingToken;
         }
@@ -64,7 +77,13 @@ public class AuthService {
             return false;
         }
         String username = identity.split(":", 2)[0];
-        authTokenService.refreshToken(token, username, identity.contains(":") ? identity.substring(identity.indexOf(':') + 1) : "default-device");
+        String deviceKey = identity.contains(":") ? identity.substring(identity.indexOf(':') + 1) : "default-device";
+        authTokenService.refreshToken(token, username, deviceKey);
+
+        User user = userCache.getIfPresent(username);
+        userCache.put(username, user);
+
+        UserContextHolder.set(user);
         return true;
     }
 
@@ -77,6 +96,9 @@ public class AuthService {
             return false;
         }
         authTokenService.revokeToken(token);
+
+        String username = identity.split(":", 2)[0];
+        userCache.invalidate(username);
         return true;
     }
 

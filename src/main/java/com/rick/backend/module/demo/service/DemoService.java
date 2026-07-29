@@ -20,7 +20,7 @@ import java.util.Optional;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Validated
-public class CourseService2 {
+public class DemoService {
 
     CourseDAO courseDAO;
 

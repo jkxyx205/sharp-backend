@@ -2,6 +2,7 @@ package com.rick.backend.module.auth.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.rick.backend.module.auth.config.AuthConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -11,16 +12,14 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class AuthTokenService {
 
-    private static final long TOKEN_EXPIRE_MINUTES = 120;
-
     private final Cache<String, String> tokenCache = Caffeine.newBuilder()
-            .expireAfterWrite(TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES)
-            .maximumSize(10_000)
+            .expireAfterWrite(AuthConstants.TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES)
+            .maximumSize(AuthConstants.MAXIMUM_SIZE)
             .build();
 
     private final Cache<String, Set<String>> usernameTokenCache = Caffeine.newBuilder()
-            .expireAfterWrite(TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES)
-            .maximumSize(10_000)
+            .expireAfterWrite(AuthConstants.TOKEN_EXPIRE_MINUTES, TimeUnit.MINUTES)
+            .maximumSize(AuthConstants.MAXIMUM_SIZE)
             .build();
 
     public void manageToken(String username, String deviceKey, String token) {
