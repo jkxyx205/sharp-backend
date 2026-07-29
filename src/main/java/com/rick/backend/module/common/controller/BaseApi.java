@@ -112,14 +112,14 @@ public class BaseApi<S extends BaseServiceImpl<? extends EntityDAO<T, ID>, T, ID
     }
 
     @PutMapping("{id}")
-    public EntityId<ID> update(@PathVariable ID id, @Valid @RequestBody T t) {
+    public T update(@PathVariable ID id, @Valid @RequestBody T t) {
         t.setId(id);
         baseService.update(t);
         return t;
     }
 
     @PostMapping
-    public EntityId<ID> saveOrUpdate(@Valid @RequestBody T t) {
+    public T saveOrUpdate(@Valid @RequestBody T t) {
         baseService.insertOrUpdate(t);
         return t;
     }
