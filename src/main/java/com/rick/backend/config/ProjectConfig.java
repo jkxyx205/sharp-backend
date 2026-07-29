@@ -2,6 +2,7 @@ package com.rick.backend.config;
 
 import com.rick.backend.module.auth.entity.User;
 import com.rick.backend.module.auth.service.UserContextHolder;
+import com.rick.backend.module.common.servlet.AccessFilter;
 import com.rick.common.http.exception.ApiExceptionHandler;
 import com.rick.common.http.web.SharpWebMvcConfigurer;
 import com.rick.db.repository.TableDAO;
@@ -10,6 +11,7 @@ import com.rick.db.repository.support.IdToEntityConverterFactory;
 import com.rick.db.repository.support.InsertUpdateCallback;
 import com.rick.db.repository.support.baseinfo.ExtendInsertUpdateCallback;
 import com.rick.db.repository.support.baseinfo.ExtendTableDAOImpl;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -65,6 +67,17 @@ public class ProjectConfig extends SharpWebMvcConfigurer {
         // private Person person;
         // GET person = "1" => person.setId(1L)
         return Arrays.asList(new IdToEntityConverterFactory());
+    }
+
+    @Bean
+    public FilterRegistrationBean httpServletRequestReplacedFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new AccessFilter());
+        // /* 是全部的请求拦截，和Interceptor的拦截地址/**区别开
+        registration.addUrlPatterns("/*");
+        registration.setName("accessRequestFilter");
+        registration.setOrder(1);
+        return registration;
     }
 
 }
