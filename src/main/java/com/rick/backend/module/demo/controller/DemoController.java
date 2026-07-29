@@ -1,5 +1,6 @@
 package com.rick.backend.module.demo.controller;
 
+import com.rick.backend.module.common.model.ApiVersion;
 import com.rick.backend.module.demo.entity.Course;
 import com.rick.backend.module.demo.service.CourseService;
 import com.rick.common.http.exception.BizException;
@@ -35,5 +36,17 @@ public class DemoController {
     @GetMapping("error")
     public String error() {
         throw new BizException("error");
+    }
+
+    @GetMapping("{version}/test")
+    @ApiVersion("v1")
+    public String v1() {
+        return "v1";
+    }
+
+    @GetMapping("{version}/test")
+    @ApiVersion("v2")
+    public String v2() {
+        return "v2";
     }
 }
