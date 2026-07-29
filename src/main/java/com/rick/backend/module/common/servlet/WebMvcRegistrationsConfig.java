@@ -34,10 +34,15 @@ public class WebMvcRegistrationsConfig implements WebMvcRegistrations {
     private class VersionRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
         @Override
         protected RequestCondition<?> getCustomMethodCondition(Method method) {
-            ApiVersion apiVersion = AnnotationUtils.findAnnotation(method, ApiVersion.class);
-            if (apiVersion == null) {
+            ApiVersion methodVersion = AnnotationUtils.findAnnotation(method, ApiVersion.class);
+            if (methodVersion == null) {
+                Class<?> declaringClass = method.getDeclaringClass();
+                methodVersion = AnnotationUtils.findAnnotation(declaringClass, ApiVersion.class);
+            }
+            if (methodVersion == null) {
                 return null;
             }
+            final String expectedVersion = methodVersion.value();
             return new RequestCondition() {
                 @Override
                 public Object combine(Object o) {
@@ -47,7 +52,7 @@ public class WebMvcRegistrationsConfig implements WebMvcRegistrations {
                 @Override
                 public Object getMatchingCondition(HttpServletRequest request) {
                     String version = resolveVersion(method, request);
-                    if (Objects.equals(version, apiVersion.value())) {
+                    if (Objects.equals(version, expectedVersion)) {
                         return this;
                     }
                     return null;
@@ -73,29 +78,48 @@ public class WebMvcRegistrationsConfig implements WebMvcRegistrations {
         }
 
         private String resolvePathVersion(Method method, HttpServletRequest request) {
-            String bastPath = null;
-            Annotation[] annotations = method.getAnnotations();
-            for (Annotation annotation : annotations) {
-                if (annotation.annotationType() == RequestMapping.class) {
-                    bastPath = ((RequestMapping) annotation).value()[0];
-                    break;
-                } else if (annotation.annotationType() == GetMapping.class) {
-                    bastPath = ((GetMapping) annotation).value()[0];
-                    break;
-                } else if (annotation.annotationType() == PostMapping.class) {
-                    bastPath = ((PostMapping) annotation).value()[0];
-                    break;
-                } else if (annotation.annotationType() == DeleteMapping.class) {
-                    bastPath = ((DeleteMapping) annotation).value()[0];
-                    break;
-                } else if (annotation.annotationType() == PutMapping.class) {
-                    bastPath = ((PutMapping) annotation).value()[0];
-                    break;
-                }
+            StringBuilder pathBuilder = new StringBuilder();
+            Class<?> declaringClass = method.getDeclaringClass();
+
+            String classPath = resolvePathFromAnnotations(declaringClass.getAnnotations());
+            if (StringUtils.hasText(classPath)) {
+                pathBuilder.append(classPath);
             }
-            Map<String, String> uriVariables = getPathMatcher().extractUriTemplateVariables(bastPath.startsWith("/") ? bastPath : "/" + bastPath,
+
+            String methodPath = resolvePathFromAnnotations(method.getAnnotations());
+            if (StringUtils.hasText(methodPath)) {
+                if (pathBuilder.length() > 0 && !methodPath.startsWith("/")) {
+                    pathBuilder.append('/');
+                }
+                pathBuilder.append(methodPath);
+            }
+
+            if (pathBuilder.length() == 0) {
+                return null;
+            }
+
+            String fullPath = pathBuilder.toString();
+            Map<String, String> uriVariables = getPathMatcher().extractUriTemplateVariables(
+                    fullPath.startsWith("/") ? fullPath : "/" + fullPath,
                     request.getServletPath());
             return uriVariables.get(VERSION_PARAM_NAME);
+        }
+
+        private String resolvePathFromAnnotations(Annotation[] annotations) {
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType() == RequestMapping.class) {
+                    return ((RequestMapping) annotation).value()[0];
+                } else if (annotation.annotationType() == GetMapping.class) {
+                    return ((GetMapping) annotation).value()[0];
+                } else if (annotation.annotationType() == PostMapping.class) {
+                    return ((PostMapping) annotation).value()[0];
+                } else if (annotation.annotationType() == DeleteMapping.class) {
+                    return ((DeleteMapping) annotation).value()[0];
+                } else if (annotation.annotationType() == PutMapping.class) {
+                    return ((PutMapping) annotation).value()[0];
+                }
+            }
+            return null;
         }
     }
 }
