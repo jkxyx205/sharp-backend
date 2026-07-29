@@ -73,8 +73,10 @@ public class DBInit {
         Properties props = new Properties();
         try (InputStream in = new ClassPathResource(".env-dev.properties").getInputStream()) {
             props.load(in);
-        } finally {
-            return props;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        return props;
     }
 }

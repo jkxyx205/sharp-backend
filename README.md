@@ -11,7 +11,19 @@
 - **单元测试示例**：包含测试用例 `TableGeneratorTest` 作为参考。
 
 **快速开始（本地）**
-前提：安装 JDK 与 Gradle（或使用项目自带的 `gradlew`）。
+
+**环境要求**
+- **JDK**：JDK 8 及以上（推荐 JDK 17）
+- **Gradle**：7.5.1（项目已自带 `gradlew`，无需单独安装）
+- **数据库**：MySQL 8.0+ 或 PostgreSQL（凭个人偏好选择，默认配置在 `.env-dev.properties`）
+
+**数据库初始化**
+项目提供了两个测试类，用于从本地指定目录导入数据库备份 SQL（常用于本地恢复生产数据快照）：
+
+- `DBInit`（MySQL）：读取 `/Users/rick/Space/Share` 目录下形如 `timeline-YYYY-MM-DD.sql` 的文件，自动创建新数据库并导入。需要修改 `DBInit.java` 中的 `folder` 路径和 `FILE_DATABASE_NAME` 以匹配你的环境。
+- `DBInit2`（PostgreSQL）：逻辑同上，导入 `timeline-YYYY-MM-DD.sql`，并依赖 `.env-dev.properties` 配置文件。
+
+说明：这两个类位于 `src/test/java/com/rick/backend/`，属于测试维护脚本，不会随应用启动执行，按需手动运行。
 
 运行应用（使用 Gradle wrapper）：
 
@@ -55,22 +67,22 @@ public class CourseApi extends BaseApi<CourseService, Course, Long> {
 
 ```bash
 # 列表
-curl -sS "http://localhost:8080/courses"
+curl -sS "http://localhost:9090/courses"
 
 # 详情列表
-curl -sS "http://localhost:8080/courses/detail"
+curl -sS "http://localhost:9090/courses/detail"
 
 # 新建模板
-curl -sS "http://localhost:8080/courses/new"
+curl -sS "http://localhost:9090/courses/new"
 
 # 查询 id=1
-curl -sS "http://localhost:8080/courses/1"
+curl -sS "http://localhost:9090/courses/1"
 
 # 保存/更新（JSON body）
-curl -sS -X POST "http://localhost:8080/courses" -H "Content-Type: application/json" -d '{"name":"新课程","teacher":"李老师"}'
+curl -sS -X POST "http://localhost:9090/courses" -H "Content-Type: application/json" -d '{"name":"新课程","teacher":"李老师"}'
 
 # 删除 id=1
-curl -sS -X DELETE "http://localhost:8080/courses/1"
+curl -sS -X DELETE "http://localhost:9090/courses/1"
 ```
 
 扩展/注意事项：

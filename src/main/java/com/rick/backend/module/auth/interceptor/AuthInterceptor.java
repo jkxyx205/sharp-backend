@@ -6,8 +6,8 @@ import com.rick.backend.module.auth.service.UserContextHolder;
 import com.rick.common.http.HttpServletRequestUtils;
 import com.rick.common.http.HttpServletResponseUtils;
 import com.rick.common.http.model.ResultUtils;
-import com.rick.common.model.Device;
 import com.rick.common.util.DeviceUtils;
+import com.rick.common.util.model.Device;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -47,7 +48,13 @@ public class AuthInterceptor implements HandlerInterceptor {
         return false;
     }
 
-    public void log(HttpServletRequest request, User user) {
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+                                @Nullable Exception ex) {
+        UserContextHolder.remove();
+    }
+
+    private void log(HttpServletRequest request, User user) {
         if (!(request.getRequestURI().matches(".*[.](js|css|png|jpeg|jpg)") ||
                 request.getRequestURI().equals("/") ||
                 request.getRequestURI().endsWith("/error") ||

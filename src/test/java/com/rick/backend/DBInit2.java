@@ -28,7 +28,7 @@ public class DBInit2 {
 
     private static String folder = "/Users/rick/Space/Share"; // challenge-2025-12-09.sql
 
-    private static final String FILE_DATABASE_NAME = "challenge";
+    private static final String FILE_DATABASE_NAME = "timeline";
 
     @Test
     public void init() throws IOException, SQLException {
@@ -91,11 +91,13 @@ public class DBInit2 {
 
     private Properties getDatabaseProperties() {
         Properties props = new Properties();
-        try (InputStream in = new ClassPathResource(".env.postgres.properties").getInputStream()) {
+        try (InputStream in = new ClassPathResource(".env-dev.properties").getInputStream()) {
             props.load(in);
-        } finally {
-            return props;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        return props;
     }
 
     private String getRootURL(String url) {

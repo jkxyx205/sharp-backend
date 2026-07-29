@@ -74,7 +74,7 @@ public class BaseApi<S extends BaseServiceImpl<? extends EntityDAO<T, ID>, T, ID
     @GetMapping("one")
     public T one(HttpServletRequest request) {
         Map<String, Object> params = HttpServletRequestUtils.getParameterMap(request);
-        return getEntityFromOptional(OperatorUtils.expectedAsOptional(entityDAO.select(SQLParamCleaner.formatSql(" WHERE " + entityDAO.getTableMeta().getConditionSQL(), params, new HashMap<>()).replaceAll(" WHERE ", ""), params)), params);
+        return getEntityFromOptional(OperatorUtils.expectedAsOptional(entityDAO.select(SQLParamCleaner.formatSql(entityDAO.getTableMeta().getConditionSQL(), params, new HashMap<>()), params)), params);
     }
 
 //    @GetMapping("one")

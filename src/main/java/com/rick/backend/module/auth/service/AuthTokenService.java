@@ -50,6 +50,16 @@ public class AuthTokenService {
         return tokenCache.getIfPresent(token);
     }
 
+    public void refreshToken(String token) {
+        String identity = getIdentity(token);
+        if (identity == null) {
+            return;
+        }
+        String username = identity.split(":", 2)[0];
+        String deviceKey = identity.contains(":") ? identity.substring(identity.indexOf(':') + 1) : "default-device";
+        refreshToken(token, username, deviceKey);
+    }
+
     public void refreshToken(String token, String username, String deviceKey) {
         manageToken(username, deviceKey, token);
     }

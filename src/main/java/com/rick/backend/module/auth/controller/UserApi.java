@@ -1,6 +1,7 @@
 package com.rick.backend.module.auth.controller;
 
 import com.rick.backend.module.auth.entity.User;
+import com.rick.backend.module.auth.service.UserContextHolder;
 import com.rick.backend.module.auth.service.UserService;
 import com.rick.backend.module.common.controller.BaseApi;
 import com.rick.common.http.model.Result;
@@ -25,7 +26,7 @@ public class UserApi extends BaseApi<UserService, User, Long> {
 
     @PostMapping("/change-password")
     public Result<?> changePassword(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
+        String username = UserContextHolder.get().getUsername(); // body.get("username");
         String oldPassword = body.get("oldPassword");
         String newPassword = body.get("newPassword");
         baseService.changePassword(username, oldPassword, newPassword);

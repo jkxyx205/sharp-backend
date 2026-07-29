@@ -81,8 +81,11 @@ public class AuthService {
         authTokenService.refreshToken(token, username, deviceKey);
 
         User user = userCache.getIfPresent(username);
+        if (user == null) {
+            user = userService.findByUsername(username)
+                    .orElseThrow(() -> new BizException(401, "用户名不存在"));
+        }
         userCache.put(username, user);
-
         UserContextHolder.set(user);
         return true;
     }
