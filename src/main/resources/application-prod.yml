@@ -11,4 +11,4 @@ logging:
         hikari:
           ERROR
   file:
-    path: /usr/local/projects/sharp-backend/log
+    path: log
