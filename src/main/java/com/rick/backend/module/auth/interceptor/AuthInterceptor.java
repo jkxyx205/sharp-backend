@@ -28,16 +28,15 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
 
-    static String TOKEN_HEADER = "token";
+    static String AUTHORIZATION_HEADER = "Authorization";
+    static String BEARER_PREFIX = "Bearer ";
+    static String PARAM_TOKEN = "token";
 
     AuthService authService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        String token = request.getHeader(TOKEN_HEADER);
-        if (StringUtils.isBlank(token)) {
-            token = request.getParameter(TOKEN_HEADER);
-        }
+        String token = resolveToken(request);
 
         if (authService.validateAndRefresh(token)) {
             log(request, UserContextHolder.get());
@@ -52,6 +51,24 @@ public class AuthInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
                                 @Nullable Exception ex) {
         UserContextHolder.remove();
+    }
+
+    /**
+     * 从请求中解析 token：
+     * 优先从 Authorization: Bearer <token> header 中提取，
+     * 其次从 query parameter token= 中提取（兼容旧客户端）。
+     */
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.isNotBlank(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(BEARER_PREFIX.length());
+        }
+        // 兼容 query parameter 传参
+        String paramToken = request.getParameter(PARAM_TOKEN);
+        if (StringUtils.isNotBlank(paramToken)) {
+            return paramToken;
+        }
+        return null;
     }
 
     private void log(HttpServletRequest request, User user) {

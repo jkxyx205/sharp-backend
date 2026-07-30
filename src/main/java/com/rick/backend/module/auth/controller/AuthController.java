@@ -6,6 +6,7 @@ import com.rick.common.http.model.ResultUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +30,22 @@ public class AuthController {
 
     @PostMapping("/logout")
     public Result<?> logout(HttpServletRequest request) {
-        String token = request.getHeader("token");
+        String token = resolveBearerToken(request);
         boolean success = authService.logout(token);
         if (success) {
             return ResultUtils.success(null);
         }
         return ResultUtils.fail(401, "未登录或 token 无效");
+    }
+
+    /**
+     * 从 Authorization: Bearer <token> header 中提取 token。
+     */
+    private String resolveBearerToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }
