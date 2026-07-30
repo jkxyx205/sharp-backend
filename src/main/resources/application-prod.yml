@@ -4,7 +4,7 @@ spring:
       - optional:file:.env-prod.properties
 logging:
   level:
-    com.rick.admin: DEBUG
+    com.rick.backend: DEBUG
     com.rick.db: DEBUG
     com:
       zaxxer:
