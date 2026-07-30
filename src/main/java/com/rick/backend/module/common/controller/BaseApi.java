@@ -118,6 +118,13 @@ public class BaseApi<S extends BaseServiceImpl<? extends EntityDAO<T, ID>, T, ID
         return t;
     }
 
+    @PatchMapping("{id}")
+    public T patch(@PathVariable ID id, @Valid @RequestBody T t) {
+        t.setId(id);
+        baseService.patch(t);
+        return t;
+    }
+
     @PostMapping
     public T saveOrUpdate(@Valid @RequestBody T t) {
         baseService.insertOrUpdate(t);
