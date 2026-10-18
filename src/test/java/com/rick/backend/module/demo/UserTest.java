@@ -4,9 +4,14 @@ import com.rick.backend.BaseTest;
 import com.rick.backend.module.auth.entity.User;
 import com.rick.backend.module.auth.service.UserService;
 import com.rick.common.util.Maps;
+import com.rick.db.repository.TableDAO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserTest extends BaseTest<UserService, User, Long> {
 
@@ -46,5 +51,17 @@ public class UserTest extends BaseTest<UserService, User, Long> {
         baseService.patch(user);
 
         //        baseService.updateById("mobile", user.getId(), "19912349098"); // 可以跳过实体的验证 updatable
+    }
+
+    @Test
+    public void testNullParamSelect() {
+        TableDAO tableDAO = baseService.getBaseDAO().getTableDAO();
+        Map<String, Object> params = new HashMap<>();
+//        params.put("username", "rick");
+//        params.put("username", ""); // size = 0
+        params.put("username", null); // size = 0
+
+        List<Map<String, Object>> list = tableDAO.select("select * from sys_user where username = :username", params);
+        System.out.println(list);
     }
 }
