@@ -36,6 +36,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String path = request.getServletPath();
+
+        if(path.equals("/swagger-ui.html")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/v3/api-docs/")) {
+            return true;
+        }
+
         String token = resolveToken(request);
 
         if (authService.validateAndRefresh(token)) {
